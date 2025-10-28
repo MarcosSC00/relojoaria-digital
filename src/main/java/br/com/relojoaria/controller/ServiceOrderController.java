@@ -12,43 +12,55 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/service-order")
 @RequiredArgsConstructor
 public class ServiceOrderController {
 
-    private final ServiceOrderService serviceOrderService;
+    private final ServiceOrderService service;
+
+    @GetMapping
+    public ResponseEntity<List<ServiceOrderResponse>> getAll() {
+        return ResponseEntity.ok(service.getAll());
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ServiceOrderResponse> getById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(serviceOrderService.getById(id));
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @PostMapping
     public ResponseEntity<ServiceOrderResponse> create(@RequestBody @Valid ServiceOrderRequest request) {
-        ServiceOrderResponse task = serviceOrderService.create(request);
+        ServiceOrderResponse task = service.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ServiceOrderResponse> update(@PathVariable Long id, @RequestBody @Valid ServiceOrderUpdate dto) {
-        return ResponseEntity.ok(serviceOrderService.update(id, dto));
+        return ResponseEntity.ok(service.update(id, dto));
     }
 
-    @PostMapping("/add-subservice/{serviceOrderId}")
+    @PostMapping("/{serviceOrderId}/add-subservice")
     public ResponseEntity<SubServiceResponse> addItemsToServiceOrder(@PathVariable("serviceOrderId") Long serviceOrderId, @RequestBody @Valid SubServiceRequest dto) {
-        return ResponseEntity.ok(serviceOrderService.addSubServiceOrder(serviceOrderId, dto));
+        return ResponseEntity.ok(service.addSubServiceOrder(serviceOrderId, dto));
     }
 
     @PostMapping("{serviceOrderId}/remove-subservice/{subServiceId}")
     public ResponseEntity<Void> removeItemToServiceOrder(@PathVariable("serviceOrderId") Long serviceOrderId, @PathVariable("subServiceId") Long subServiceId) {
-        serviceOrderService.removeSubServiceOrder(serviceOrderId, subServiceId);
+        service.removeSubServiceOrder(serviceOrderId, subServiceId);
         return  ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("{serviceOrderId}/sub-services")
+    public ResponseEntity<List<SubServiceResponse>> getSubServices(@PathVariable("serviceOrderId") Long serviceOrderId) {
+        return ResponseEntity.ok(service.getSubServiceOrders(serviceOrderId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        serviceOrderService.delete(id);
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

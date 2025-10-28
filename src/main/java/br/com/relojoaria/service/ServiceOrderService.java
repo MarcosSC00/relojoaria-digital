@@ -17,5 +17,4 @@ public interface ServiceOrderService {
     SubServiceResponse addSubServiceOrder(Long serviceOrderId, SubServiceRequest dto);
     void removeSubServiceOrder(Long serviceOrderId, Long subServiceId);
     List<SubServiceResponse> getSubServiceOrders(Long serviceOrderId);
-
 }

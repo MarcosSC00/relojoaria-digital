@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -28,6 +29,12 @@ public class StockController {
     @GetMapping("{id}")
     public ResponseEntity<StockResponse> getById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(stockService.getById(id));
+    }
+
+    @PostMapping("/{productName}/{quantity}")
+    public ResponseEntity<StockResponse> update(@PathVariable("productName") String productName,
+                                                @PathVariable("quantity") BigDecimal quantity){
+        return ResponseEntity.ok(stockService.updateStock(productName, quantity));
     }
 
     @GetMapping

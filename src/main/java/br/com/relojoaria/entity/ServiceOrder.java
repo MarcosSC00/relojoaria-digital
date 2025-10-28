@@ -5,9 +5,6 @@ import br.com.relojoaria.enums.ServiceType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,7 +23,7 @@ public class ServiceOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, length = 100)
     private String title;
 
     @Column(length = 200)
@@ -40,16 +37,15 @@ public class ServiceOrder {
     @Enumerated(EnumType.STRING)
     private ServiceType type;
 
-    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "end_date")
     private LocalDateTime endDate;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
@@ -58,10 +54,10 @@ public class ServiceOrder {
     @JsonIgnore
     private List<SubService> subServices;
 
-    @Column(name = "add_value")
+    @Column(name = "add_value", precision = 10, scale = 3)
     private BigDecimal addValue = BigDecimal.ZERO;
 
-    @Column(name = "total_price")
+    @Column(name = "total_price", precision = 10, scale = 3, nullable = false)
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "serviceOrder")
@@ -70,9 +66,7 @@ public class ServiceOrder {
 
     @PrePersist
     protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
+        this.createdAt = LocalDateTime.now();;
     }
 
     @PreUpdate

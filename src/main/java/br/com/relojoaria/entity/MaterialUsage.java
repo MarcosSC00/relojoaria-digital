@@ -1,6 +1,7 @@
 package br.com.relojoaria.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,18 +24,18 @@ public class MaterialUsage {
     @JoinColumn(name = "service_order_id")
     private ServiceOrder serviceOrder;
 
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "stock_id", nullable = false)
-    private Stock stock;
+    @JoinColumn(name = "product", nullable = false)
+    private Product product;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subservice_id")
     private SubService subService;
 
-    @Column(name="qtd_used")
+    @Column(name="qtd_used", precision = 10, scale = 3)
     private BigDecimal quantityUsed;
 
-    @Column(name = "sub_total")
+    @Column(name = "sub_total",  precision = 10, scale = 3)
     private BigDecimal subTotal;
-
 }

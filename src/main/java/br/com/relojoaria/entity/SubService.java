@@ -8,8 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,15 +34,9 @@ public class SubService {
     @Enumerated(EnumType.STRING)
     private ServiceStatus status;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ServiceType type;
-
-    @CreatedDate
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -52,7 +44,7 @@ public class SubService {
     @JoinColumn(name = "service_order_id", nullable = false)
     private ServiceOrder serviceOrder;
 
-    @Column(name = "price")
+    @Column(name = "price", precision = 10, scale = 3, nullable = false)
     private BigDecimal price = BigDecimal.ZERO;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subService")
@@ -61,9 +53,7 @@ public class SubService {
 
     @PrePersist
     protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
+        this.createdAt = LocalDateTime.now();
     }
 
     @PreUpdate

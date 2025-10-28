@@ -1,5 +1,6 @@
 package br.com.relojoaria.service;
 
+import br.com.relojoaria.dto.ClientCustomDto;
 import br.com.relojoaria.dto.request.ClientRequest;
 import br.com.relojoaria.dto.response.ClientResponse;
 import br.com.relojoaria.dto.response.ServiceOrderResponse;
@@ -7,9 +8,9 @@ import br.com.relojoaria.dto.response.ServiceOrderResponse;
 import java.util.List;
 
 public interface ClientService {
-    List<ClientResponse> findAll();
+    List<ClientCustomDto> getAll();
 
-    ClientResponse findById(Long id);
+    ClientCustomDto getById(Long id);
 
     ClientResponse create(ClientRequest dto);
 

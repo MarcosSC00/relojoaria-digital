@@ -1,5 +1,6 @@
 package br.com.relojoaria.controller;
 
+import br.com.relojoaria.dto.ClientCustomDto;
 import br.com.relojoaria.dto.request.ClientRequest;
 import br.com.relojoaria.dto.response.ClientResponse;
 import br.com.relojoaria.dto.response.ServiceOrderResponse;
@@ -22,8 +23,13 @@ public class ClientController {
     private final ClientService clientService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClientResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(clientService.findById(id));
+    public ResponseEntity<ClientCustomDto> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(clientService.getById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ClientCustomDto>> getAll() {
+        return ResponseEntity.ok(clientService.getAll());
     }
 
     @PostMapping
@@ -42,7 +48,7 @@ public class ClientController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/service-order/{clientId}")
+    @GetMapping("/{clientId}/service-order")
     public ResponseEntity<List<ServiceOrderResponse>> getTasks(@PathVariable("clientId") Long clientId) {
         return ResponseEntity.ok(clientService.getTasks(clientId));
     }

@@ -2,17 +2,13 @@ package br.com.relojoaria.dto.request;
 
 import br.com.relojoaria.enums.ServiceStatus;
 import br.com.relojoaria.enums.ServiceType;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class ServiceOrderUpdate {
     private Long requesterId;
 
@@ -26,6 +22,7 @@ public class ServiceOrderUpdate {
 
     private ServiceType type;
 
+    @Digits(integer = 7, fraction = 3, message = "The value must have a maximum of three decimal places")
     private BigDecimal addValue = BigDecimal.ZERO;
 
     private LocalDateTime endDate;

@@ -9,6 +9,7 @@ import br.com.relojoaria.dto.request.SubServiceRequest;
 import br.com.relojoaria.dto.response.ServiceOrderResponse;
 import br.com.relojoaria.dto.response.SubServiceResponse;
 import br.com.relojoaria.entity.*;
+import br.com.relojoaria.error.exception.NotFoundException;
 import br.com.relojoaria.repository.ClientRepository;
 import br.com.relojoaria.repository.ServiceOrderRepository;
 import br.com.relojoaria.repository.StockRepository;
@@ -36,7 +37,7 @@ public class ServiceOrderImpl implements ServiceOrderService {
     private final StockRepository stockRepository;
     private final SubServiceService subServiceOrderService;
     private final SubServiceRepository subRepository;
-    private final SubServiceAdapter subServiceOrderAdapter;
+    private final SubServiceAdapter subServiceAdapter;
 
 
     @Override
@@ -49,7 +50,7 @@ public class ServiceOrderImpl implements ServiceOrderService {
     @Override
     public ServiceOrderResponse getById(Long id) {
         ServiceOrder serviceOrder = serviceOrderRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Servço com id:"+id+" não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Servço com id:"+id+" não encontrado"));
         return serviceOrderAdapter.toResponseDTO(serviceOrder);
     }
 
@@ -58,7 +59,7 @@ public class ServiceOrderImpl implements ServiceOrderService {
     public ServiceOrderResponse create(ServiceOrderRequest request) {
         // Validar requester
         Client client = clientRepository.findById(request.getClientId())
-                .orElseThrow(() -> new NoSuchElementException("Requester com ID: " + request.getClientId()+" não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Requester com ID: " + request.getClientId()+" não encontrado"));
 
         // Criar task base
         ServiceOrder serviceOrder = ServiceOrder.builder()
@@ -89,10 +90,10 @@ public class ServiceOrderImpl implements ServiceOrderService {
     @Override
     public ServiceOrderResponse update(Long serviceOrderId, ServiceOrderUpdate dto) {
         ServiceOrder serviceOrder = serviceOrderRepository.findById(serviceOrderId)
-                .orElseThrow(() -> new NoSuchElementException("Serviço com id:"+serviceOrderId+" não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Serviço com id:"+serviceOrderId+" não encontrado"));
         Client client = clientRepository
                 .findById(dto.getRequesterId() != null ? dto.getRequesterId() : serviceOrder.getClient().getId())
-                .orElseThrow(() -> new NoSuchElementException(" requester não encontrado"));
+                .orElseThrow(() -> new NotFoundException(" requester não encontrado"));
 
         serviceOrder.setClient(client);
         serviceOrder.setTitle(dto.getTitle() != null ? dto.getTitle() : serviceOrder.getTitle());
@@ -112,7 +113,7 @@ public class ServiceOrderImpl implements ServiceOrderService {
     @Override
     public void delete(Long id) {
         ServiceOrder serviceOrder = serviceOrderRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("task com id:"+id+" não encontrada"));
+                .orElseThrow(() -> new NotFoundException("task com id:"+id+" não encontrada"));
         serviceOrderRepository.delete(serviceOrder);
     }
 
@@ -124,29 +125,26 @@ public class ServiceOrderImpl implements ServiceOrderService {
     @Override
     public void removeSubServiceOrder(Long serviceOrderId, Long subServiceId) {
         SubService sub = subRepository.findById(subServiceId)
-                .orElseThrow(() -> new NoSuchElementException("sub-serviço não encontrado"));
+                .orElseThrow(() -> new NotFoundException("sub-serviço não encontrado"));
         subServiceOrderService.removeSubService(serviceOrderId, sub);
     }
 
     @Override
     public List<SubServiceResponse> getSubServiceOrders(Long serviceOrderId) {
-        ServiceOrder serviceOrder = serviceOrderRepository.findById(serviceOrderId)
-                .orElseThrow(() -> new NoSuchElementException("Serviço com id:"+serviceOrderId+" não encontrado"));
-        List<SubServiceResponse> subServices = serviceOrderRepository.getSubServiceOrders(serviceOrderId);
+        List<SubService> subServices = serviceOrderRepository.getSubServiceOrders(serviceOrderId);
         if (subServices.isEmpty()) {
-            throw new NoSuchElementException("Nenhum sub-serviço encontrado");
+            throw new NotFoundException("Nenhum sub-serviço encontrado");
         }
-        return  subServices;
+        return  subServices.stream().map(subServiceAdapter::toResponse).toList();
     }
 
-    @Transactional
     private void processStockItems(ServiceOrder serviceOrder, List<MaterialUsageRequest> stockItems) {
 
         if (stockItems == null || stockItems.isEmpty()) return;
         for (MaterialUsageRequest itemRequest : stockItems) {
             // Buscar stock pelo nome do item
             Stock stock = stockRepository.findByProductName(itemRequest.getProductName())
-                    .orElseThrow(() -> new NoSuchElementException(
+                    .orElseThrow(() -> new NotFoundException(
                             "Stock não possui o item: " + itemRequest.getProductName()));
 
             // Validar quantidade disponível
@@ -158,7 +156,7 @@ public class ServiceOrderImpl implements ServiceOrderService {
             // Criar MaterialUsage
             MaterialUsage materialUsage = MaterialUsage.builder()
                     .serviceOrder(serviceOrder)
-                    .stock(stock)
+                    .product(stock.getProduct())
                     .quantityUsed(itemRequest.getQuantityUsed())
                     .subTotal(subTotal)
                     .build();
@@ -172,7 +170,7 @@ public class ServiceOrderImpl implements ServiceOrderService {
 
     private void validateStockQuantity(Stock stock, BigDecimal qtdUsed) {
         if (stock.getCurrentQuantity().compareTo(qtdUsed) < 0) {
-            throw new NoSuchElementException( "Quantidade insuficiente em estoque");
+            throw new NotFoundException( "Quantidade insuficiente em estoque");
         }
     }
 

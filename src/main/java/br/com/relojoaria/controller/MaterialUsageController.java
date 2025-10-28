@@ -16,14 +16,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MaterialUsageController {
 
-    private final MaterialUsageService serivce;
+    private final MaterialUsageService service;
 
     @GetMapping("/{id}")
     public ResponseEntity<MaterialUsageResponse> getByServiceOrderId(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(serivce.getById(id));
+        return ResponseEntity.ok(service.getById(id));
     }
     @GetMapping
     public ResponseEntity<List<MaterialUsageResponse>> getAll() {
-        return ResponseEntity.ok(serivce.getAll());
+        return ResponseEntity.ok(service.getAll());
     }
 }

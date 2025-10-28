@@ -1,22 +1,20 @@
 package br.com.relojoaria.dto.request;
 
-import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class MaterialUsageRequest {
     @NotBlank(message = "Product name is required")
+    @Size(max = 100, min = 3, message = "invalid product name")
     private String productName;
 
     @NotNull(message = "Quantity used is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Quantity must be greater than zero")
+    @Digits(integer = 7, fraction = 3, message = "The quantity must have a maximum of three decimal places")
     private BigDecimal quantityUsed;
 }

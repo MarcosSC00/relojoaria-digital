@@ -31,7 +31,11 @@ public class Client {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "client",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
     @JsonIgnore
     private List<ServiceOrder> serviceOrders;
 
@@ -44,5 +48,4 @@ public class Client {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
 }

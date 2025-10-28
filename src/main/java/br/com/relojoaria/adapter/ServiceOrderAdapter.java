@@ -8,15 +8,12 @@ import br.com.relojoaria.entity.SubService;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
 @Mapper(componentModel = "spring", uses = {MaterialUsageAdapter.class, SubServiceAdapter.class})
 public interface ServiceOrderAdapter {
-
-    ServiceOrderAdapter INSTANCE = Mappers.getMapper(ServiceOrderAdapter.class);
 
     @Mapping(target = "clientId", source = "client.id")
     @Mapping(target = "clientName", source = "client.name")

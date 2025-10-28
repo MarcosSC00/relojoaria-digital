@@ -8,7 +8,6 @@ import br.com.relojoaria.entity.MaterialUsage;
 import br.com.relojoaria.entity.ServiceOrder;
 import br.com.relojoaria.entity.Stock;
 import br.com.relojoaria.entity.SubService;
-import br.com.relojoaria.enums.ServiceType;
 import br.com.relojoaria.repository.ServiceOrderRepository;
 import br.com.relojoaria.repository.StockRepository;
 import br.com.relojoaria.repository.SubServiceRepository;
@@ -42,24 +41,27 @@ public class SubServiceImpl implements SubServiceService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .status(request.getStatus())
-                .type(ServiceType.SUB_SERVICE)
                 .price(BigDecimal.ZERO)
                 .items(new ArrayList<>())
                 .build();
 
-        processStockItems(subService, request.getItems());
+        return priceCalculator(request, serviceOrder, subService);
+    }
 
-        BigDecimal SubServicesPrice = subService.getItems().stream()
+    private SubServiceResponse priceCalculator(SubServiceRequest request, ServiceOrder serviceOrder, SubService sub) {
+        processStockItems(sub, request.getItems());
+
+        BigDecimal SubServicesPrice = sub.getItems().stream()
                 .map(MaterialUsage::getSubTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        subService.setPrice(SubServicesPrice);
+        sub.setPrice(SubServicesPrice);
 
-        serviceOrder.getSubServices().add(subService);
+        serviceOrder.getSubServices().add(sub);
 
         serviceOrder.setTotalPrice(serviceOrder.getTotalPrice().add(SubServicesPrice));
         serviceOrderRepository.save(serviceOrder);
 
-        return adapter.toResponse(subService);
+        return  adapter.toResponse(sub);
     }
 
     @Override
@@ -89,7 +91,6 @@ public class SubServiceImpl implements SubServiceService {
         serviceOrderRepository.save(serviceOrder);
     }
 
-    @Transactional
     private void processStockItems(SubService subService, List<MaterialUsageRequest> stockItems) {
         for (MaterialUsageRequest itemRequest : stockItems) {
             Stock stock = stockRepository.findByProductName(itemRequest.getProductName())
@@ -102,7 +103,7 @@ public class SubServiceImpl implements SubServiceService {
 
             MaterialUsage materialUsage = MaterialUsage.builder()
                     .subService(subService)
-                    .stock(stock)
+                    .product(stock.getProduct())
                     .quantityUsed(itemRequest.getQuantityUsed())
                     .subTotal(subTotal)
                     .build();
