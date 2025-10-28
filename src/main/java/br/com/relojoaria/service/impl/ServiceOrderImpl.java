@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,13 +54,12 @@ public class ServiceOrderImpl implements ServiceOrderService {
     }
 
     @Override
-    @Transactional
     public ServiceOrderResponse create(ServiceOrderRequest request) {
-        // Validar requester
+        // Validar cliente
         Client client = clientRepository.findById(request.getClientId())
                 .orElseThrow(() -> new NotFoundException("Requester com ID: " + request.getClientId()+" não encontrado"));
 
-        // Criar task base
+        // Criar oredem de serviço base
         ServiceOrder serviceOrder = ServiceOrder.builder()
                 .client(client)
                 .title(request.getTitle())
@@ -84,7 +82,6 @@ public class ServiceOrderImpl implements ServiceOrderService {
         ServiceOrder savedServiceOrder = serviceOrderRepository.save(serviceOrder);
 
         return serviceOrderAdapter.toResponseDTO(savedServiceOrder);
-
     }
 
     @Override
@@ -145,7 +142,7 @@ public class ServiceOrderImpl implements ServiceOrderService {
             // Buscar stock pelo nome do item
             Stock stock = stockRepository.findByProductName(itemRequest.getProductName())
                     .orElseThrow(() -> new NotFoundException(
-                            "Stock não possui o item: " + itemRequest.getProductName()));
+                            "Estoque não possui o item: " + itemRequest.getProductName()));
 
             // Validar quantidade disponível
             validateStockQuantity(stock, itemRequest.getQuantityUsed());
