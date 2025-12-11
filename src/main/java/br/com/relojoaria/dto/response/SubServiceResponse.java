@@ -11,6 +11,5 @@ public class SubServiceResponse {
     private String title;
     private String description;
     private ServiceStatus status;
-    private List<MaterialUsageResponse> items;
-
+//    private List<MaterialUsageResponse> items;
 }

@@ -33,8 +33,8 @@ public class ServiceOrderController {
 
     @PostMapping
     public ResponseEntity<ServiceOrderResponse> create(@RequestBody @Valid ServiceOrderRequest request) {
-        ServiceOrderResponse task = service.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(task);
+        ServiceOrderResponse order = service.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 
     @PutMapping("/{id}")
@@ -43,12 +43,12 @@ public class ServiceOrderController {
     }
 
     @PostMapping("/{serviceOrderId}/add-subservice")
-    public ResponseEntity<SubServiceResponse> addItemsToServiceOrder(@PathVariable("serviceOrderId") Long serviceOrderId, @RequestBody @Valid SubServiceRequest dto) {
+    public ResponseEntity<SubServiceResponse> addSubService(@PathVariable("serviceOrderId") Long serviceOrderId, @RequestBody @Valid SubServiceRequest dto) {
         return ResponseEntity.ok(service.addSubServiceOrder(serviceOrderId, dto));
     }
 
     @PostMapping("{serviceOrderId}/remove-subservice/{subServiceId}")
-    public ResponseEntity<Void> removeItemToServiceOrder(@PathVariable("serviceOrderId") Long serviceOrderId, @PathVariable("subServiceId") Long subServiceId) {
+    public ResponseEntity<Void> removeSubService(@PathVariable("serviceOrderId") Long serviceOrderId, @PathVariable("subServiceId") Long subServiceId) {
         service.removeSubServiceOrder(serviceOrderId, subServiceId);
         return  ResponseEntity.noContent().build();
     }

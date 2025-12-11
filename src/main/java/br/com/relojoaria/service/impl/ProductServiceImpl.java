@@ -3,6 +3,7 @@ package br.com.relojoaria.service.impl;
 import br.com.relojoaria.adapter.ProductAdapter;
 import br.com.relojoaria.dto.ProductDto;
 import br.com.relojoaria.entity.Product;
+import br.com.relojoaria.error.exception.NotFoundException;
 import br.com.relojoaria.repository.ProductRepository;
 import br.com.relojoaria.service.ProductService;
 import jakarta.transaction.Transactional;
@@ -33,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto update(String productName, ProductDto productDto) {
         Product product = productRepository.findByName(productName)
-                .orElseThrow(() -> new NoSuchElementException("Produto não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Produto não encontrado"));
         product.setName(productDto.getName());
         product.setUnit(productDto.getUnit());
         product.setPrice(productDto.getPrice());
@@ -45,14 +46,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto getByName(String productName) {
         Product product = productRepository.findByName(productName)
-                .orElseThrow(() -> new NoSuchElementException("Produto não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Produto não encontrado"));
         return productAdapter.toDto(product);
     }
 
     @Override
     public ProductDto getById(Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new NoSuchElementException("Produto não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Produto não encontrado"));
         return productAdapter.toDto(product);
     }
 
@@ -60,7 +61,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> getAll() {
         List<Product> products = productRepository.findAll();
         if(products.isEmpty()) {
-            throw new NoSuchElementException("Nenhum produto cadastrado");
+            throw new NotFoundException("Nenhum produto cadastrado");
         }
         return products.stream()
                 .map(productAdapter::toDto).toList();
@@ -69,7 +70,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(String productName) {
         Product product = productRepository.findByName(productName)
-                .orElseThrow(() -> new NoSuchElementException("Produto não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Produto não encontrado"));
         productRepository.delete(product);
     }
 }

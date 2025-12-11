@@ -47,9 +47,9 @@ public class SubService {
     @Column(name = "price", precision = 10, scale = 3, nullable = false)
     private BigDecimal price = BigDecimal.ZERO;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subService")
-    @JsonIgnore
-    private List<MaterialUsage> items = new ArrayList<>();
+//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subService")
+//    @JsonIgnore
+//    private List<MaterialUsage> items = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

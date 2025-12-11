@@ -5,6 +5,7 @@ import br.com.relojoaria.dto.request.StockRequest;
 import br.com.relojoaria.dto.response.StockResponse;
 import br.com.relojoaria.entity.Product;
 import br.com.relojoaria.entity.Stock;
+import br.com.relojoaria.error.exception.NotFoundException;
 import br.com.relojoaria.repository.ProductRepository;
 import br.com.relojoaria.repository.StockRepository;
 import br.com.relojoaria.service.StockService;
@@ -30,7 +31,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public StockResponse create(StockRequest dto) {
         Product product = productRepository.findByName(dto.getProductName())
-                .orElseThrow(() -> new NoSuchElementException("produto não encontrado"));
+                .orElseThrow(() -> new NotFoundException("produto não encontrado"));
         Optional<Stock> existentStock = stockRepository.findByProductName(dto.getProductName());
 
         if(existentStock.isPresent()) {
@@ -48,7 +49,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public StockResponse updateStock(String productName, BigDecimal quantity) {
         Stock stock = stockRepository.findByProductName(productName).orElseThrow(
-                () -> new NoSuchElementException("nenhum estoque do produto: "+productName+" foi encontrado")
+                () -> new NotFoundException("nenhum estoque do produto: "+productName+" foi encontrado")
         );
         BigDecimal currentQuantity = stock.getCurrentQuantity();
         if(quantity.compareTo(BigDecimal.ZERO) < 0 && currentQuantity.compareTo(quantity.abs()) > 0) {
@@ -64,7 +65,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public void delete(Long id) {
         Stock stock = stockRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException("estoque com id: "+id+" não encontrado")
+                () -> new NotFoundException("estoque com id: "+id+" não encontrado")
         );
         stockRepository.delete(stock);
     }
@@ -72,7 +73,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public StockResponse getById(Long id) {
         Stock stock = stockRepository.findById(id).orElseThrow(
-                () -> new NoSuchElementException("estoque com id: "+id+" não encontrado")
+                () -> new NotFoundException("estoque com id: "+id+" não encontrado")
         );
         return stockAdapter.toResponse(stock);
     }
@@ -82,7 +83,7 @@ public class StockServiceImpl implements StockService {
         List<StockResponse> stocks = stockRepository.findAll().stream()
                 .map(stockAdapter::toResponse).collect(Collectors.toList());
         if (stocks.isEmpty()) {
-            throw new NoSuchElementException("Nenhum estoque encontrado");
+            throw new NotFoundException("Nenhum estoque encontrado");
         }
         return stocks;
     }

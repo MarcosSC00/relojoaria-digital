@@ -16,3 +16,9 @@ spring:
       hibernate:
         format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  private:
+    key: classpath:app.key
+  public:
+    key: classpath:app.pub

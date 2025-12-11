@@ -8,6 +8,7 @@ import br.com.relojoaria.dto.response.ClientResponse;
 import br.com.relojoaria.dto.response.ServiceOrderResponse;
 import br.com.relojoaria.entity.Client;
 import br.com.relojoaria.entity.ServiceOrder;
+import br.com.relojoaria.error.exception.NotFoundException;
 import br.com.relojoaria.repository.ClientRepository;
 import br.com.relojoaria.service.ClientService;
 import jakarta.transaction.Transactional;
@@ -29,8 +30,8 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public List<ClientCustomDto> getAll() {
         List<ClientCustomDto> clients = clientRepository.findAllOrderedById();
-        if (clients.isEmpty()) {
-            throw new NoSuchElementException("Nenhum cliente encontrado");
+        if (clients == null) {
+            throw new NotFoundException("Nenhum cliente encontrado");
         }
         return clients;
     }
@@ -38,7 +39,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public ClientCustomDto getById(Long id) {
         return clientRepository.findClientWithoutOrders(id)
-                .orElseThrow(() -> new NoSuchElementException("Cliente com id: "+id+"não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Cliente com id: "+id+"não encontrado"));
     }
 
     @Override
@@ -66,7 +67,7 @@ public class ClientServiceImpl implements ClientService {
         }
         List<ServiceOrder> orders = clientRepository.findServiceOrdersById(id);
         if (orders == null) {
-            throw new NoSuchElementException("Nenhuma task encontrada");
+            throw new NotFoundException("Nenhuma task encontrada");
         }
         return orders.stream().map(serviceOrderAdapter::toResponseDTO).toList();
     }
@@ -74,7 +75,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public void delete(Long id) {
         Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Client com id: "+id+" não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Client com id: "+id+" não encontrado"));
         clientRepository.delete(client);
     }
 }

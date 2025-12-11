@@ -15,6 +15,6 @@ public class MaterialUsageRequest {
     private String productName;
 
     @NotNull(message = "Quantity used is required")
-    @Digits(integer = 7, fraction = 3, message = "The quantity must have a maximum of three decimal places")
+    @Digits(integer = 8, fraction = 2, message = "The quantity must have a maximum of two decimal places")
     private BigDecimal quantityUsed;
 }

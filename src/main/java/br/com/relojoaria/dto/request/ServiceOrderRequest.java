@@ -2,6 +2,8 @@ package br.com.relojoaria.dto.request;
 
 import br.com.relojoaria.enums.ServiceStatus;
 import br.com.relojoaria.enums.ServiceType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -25,12 +27,14 @@ public class ServiceOrderRequest {
     private String description;
 
     @NotNull(message = "Status is required", groups = ServiceStatus.class)
+    @Enumerated(EnumType.STRING)
     private ServiceStatus status;
 
     @NotNull(message = "Type is required",  groups = ServiceType.class)
+    @Enumerated(EnumType.STRING)
     private ServiceType type;
 
-    @Digits(integer = 7, fraction = 3, message = "The value must have a maximum of three decimal places")
+    @Digits(integer = 8, fraction = 2, message = "The value must have a maximum of three decimal places")
     private BigDecimal addValue = BigDecimal.ZERO;
 
     @NotNull(message = "End Date is required")

@@ -1,9 +1,6 @@
 package br.com.relojoaria.dto.request;
 
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,6 +13,7 @@ public class StockRequest {
     private String productName;
 
     @NotNull(message = "quantity is required")
-    @Digits(integer = 7, fraction = 3, message = "The value must have a maximum of three decimal places")
+    @Digits(integer = 8, fraction = 2, message = "The value must have a maximum of three decimal places")
+    @DecimalMin(value = "0.01", message = "the value must be greater than 0.00")
     private BigDecimal quantity;
 }
