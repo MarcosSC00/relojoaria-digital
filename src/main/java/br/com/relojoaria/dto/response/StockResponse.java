@@ -16,7 +16,6 @@ public class StockResponse {
     private String unit;
 
     @PrePersist
-    @PreUpdate
     public void prePersist() {
         DecimalFormat df = new DecimalFormat("#.#00,00");
         BigDecimal formatedPrice = new BigDecimal(df.format(this.currentQuantity));

@@ -2,7 +2,8 @@ package br.com.relojoaria.controller;
 
 import br.com.relojoaria.dto.request.UserLogin;
 import br.com.relojoaria.dto.request.UserRegister;
-import br.com.relojoaria.dto.response.TokenResponse;
+import br.com.relojoaria.dto.response.LoginResponse;
+import br.com.relojoaria.dto.response.UserResponse;
 import br.com.relojoaria.entity.User;
 import br.com.relojoaria.repository.UserRepository;
 import br.com.relojoaria.service.impl.TokenService;
@@ -12,10 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("auth")
@@ -35,11 +33,18 @@ public class AutheticationController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody @Valid UserLogin request) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(request.getName(), request.getPassword());
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid UserLogin request) {
+        var usernamePassword = new UsernamePasswordAuthenticationToken(request.getName(),
+                request.getPassword());
         var auth = authenticationManager.authenticate(usernamePassword);
+        User user = (User) auth.getPrincipal();
         String jwt = tokenService.generateToken((User) auth.getPrincipal());
-        return ResponseEntity.ok(new TokenResponse(jwt));
+        return ResponseEntity.ok(
+                new LoginResponse(jwt,
+                        new UserResponse(user.getId(),
+                                user.getUsername(),
+                                user.getRole()))
+        );
     }
 
     @PostMapping("/register")

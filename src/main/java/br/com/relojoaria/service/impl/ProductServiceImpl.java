@@ -4,6 +4,7 @@ import br.com.relojoaria.adapter.ProductAdapter;
 import br.com.relojoaria.dto.ProductDto;
 import br.com.relojoaria.entity.Product;
 import br.com.relojoaria.error.exception.NotFoundException;
+import br.com.relojoaria.error.exception.UnprocessableException;
 import br.com.relojoaria.repository.ProductRepository;
 import br.com.relojoaria.service.ProductService;
 import jakarta.transaction.Transactional;
@@ -23,12 +24,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto create(ProductDto productDto) {
-        Product entity = productAdapter.toEntity(productDto);
-        if(productRepository.existsByName(entity.getName())) {
-            throw new IllegalArgumentException("Produto: "+"'" + entity.getName()+ "'" + " já existente");
+        try{
+            Product entity = productAdapter.toEntity(productDto);
+            if(productRepository.existsByName(entity.getName())) {
+                throw new IllegalArgumentException("Produto já existente");
+            }
+            Product product = productRepository.save(productAdapter.toEntity(productDto));
+            return  productAdapter.toDto(product);
+        }catch (UnprocessableException ex){
+            throw new UnprocessableException("Erro ao criar produto");
         }
-        Product product = productRepository.save(productAdapter.toEntity(productDto));
-        return  productAdapter.toDto(product);
     }
 
     @Override

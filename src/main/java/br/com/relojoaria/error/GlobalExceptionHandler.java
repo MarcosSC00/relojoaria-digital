@@ -8,6 +8,7 @@ import br.com.relojoaria.error.exception.UnprocessableException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -69,17 +70,31 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex,
                                                                         HttpServletRequest request) {
         ErrorResponse body = ErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Bad request")
+                .status(HttpStatus.CONFLICT.value())
+                .error("illegal argument")
                 .message(ex.getMessage())
                 .timestamp(Instant.now().toString())
                 .path(request.getRequestURI())
                 .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex,
+                                                                       HttpServletRequest request) {
+        ErrorResponse body = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Incorrect username or password")
+                .message(ex.getMessage())
+                .timestamp(Instant.now().toString())
+                .path(request.getRequestURI())
+                .build();
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleException(HttpServletRequest request) {
         ErrorResponse body = ErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("Internal server error")
